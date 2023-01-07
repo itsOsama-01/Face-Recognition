@@ -1,6 +1,26 @@
 import cv2
 import time
 import datetime
+import json
+
+
+def doEntry():
+    day=datetime.datetime.now().strftime("%d-%m-%Y")
+    time=datetime.datetime.now().strftime("%H-%M-%S")
+    dicToAppend={"entry":{"date":f"{day}","time":f"{time}"}}
+
+    newJsonEnd=","+json.dumps(dicToAppend)[1:-1]+"}\n"
+
+    with open("log.json","r+") as f:
+        f.seek(0,2)
+        index=f.tell()
+
+        while not f.read().startswith('}'):
+            index-=1
+            f.seek(index)
+        f.seek(index)
+        f.write(newJsonEnd)
+
 
 #Capturing video from webcam
 cap=cv2.VideoCapture(0)
@@ -35,7 +55,7 @@ while True:
         else:
             detection=True
             dayAndTime=datetime.datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
-            print(dayAndTime)
+            doEntry()
             videoRecord = cv2.VideoWriter(f"{dayAndTime}.mp4", videoFormat, 20, frameSize)
     elif detection:
         if isTimerStarted:
